@@ -19,13 +19,16 @@ app.use(
 app.use(express.json());
 
 // routes
-
 app.get("/", (req, res) => {
   res.status(200).json({ message: "welcome to tormack sercer!" });
 });
 
 const port = process.env.PORT || 8080;
+const uri = process.env.MONGO_URI;
 
-app.listen(port, () => {
-  console.log(`server runnig on port: ${port}`);
+// mongoose
+mongoose.connect(uri, { useUnifiedTopology: true }).then(() => {
+  app.listen(port, () => {
+    console.log(`server runnig on port: ${port}`);
+  });
 });
