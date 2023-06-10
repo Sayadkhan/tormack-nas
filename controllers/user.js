@@ -2,6 +2,8 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
 
+const mongoose = require("mongoose");
+
 // jwt token
 const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: "1d" });
@@ -61,7 +63,33 @@ const loginUser = async (req, res) => {
   }
 };
 
+//get an User
+const getUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // cheak user id mongodb er stander id or not
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw Error("user not found");
+    }
+    if (userId !== req.user?._id.toString()) {
+      throw Error("unauthorized access.");
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw Error("user not found.");
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(404).json({ error: err.message });
+  }
+};
+
 module.exports = {
   signupUser,
   loginUser,
+  getUser,
 };
